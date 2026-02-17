@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>API Debug</title>
+  <style>
+    body { font-family: monospace; padding: 20px; max-width: 900px; }
+    pre { background: #f5f5f5; padding: 15px; overflow-x: auto; white-space: pre-wrap; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    .ok { color: green; }
+    .err { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Travelian API Debug</h1>
+  <p>Base URL: <input id="base" value="http://localhost:5000" size="40"></p>
+  <div>
+    <button onclick="test('health')">1. Health</button>
+    <button onclick="test('token')">2. Test Token</button>
+    <button onclick="test('amadeus')">3. Test Amadeus (both envs)</button>
+    <button onclick="test('flight')">4. Flight Search (MAD→BCN)</button>
+  </div>
+  <h3>Response:</h3>
+  <pre id="out">Click a button above.</pre>
+  <script>
+    async function test(which) {
+      const base = document.getElementById('base').value.trim();
+      const out = document.getElementById('out');
+      out.textContent = 'Loading...';
+      try {
+        let url;
+        if (which === 'health') url = base + '/api/health';
+        else if (which === 'token') url = base + '/api/test-token';
+        else if (which === 'amadeus') url = base + '/api/test-amadeus';
+        else if (which === 'flight') url = base + '/api/flight-search?originCode=MAD&destinationCode=BCN&dateOfDeparture=2025-04-15';
+        const r = await fetch(url);
+        const text = await r.text();
+        let json;
+        try { json = JSON.parse(text); } catch (e) { json = text; }
+        out.textContent = 'Status: ' + r.status + '\n\n' + JSON.stringify(json, null, 2);
+        out.className = r.ok ? 'ok' : 'err';
+      } catch (e) {
+        out.textContent = 'Error: ' + e.message + '\n\nIs the server running? (npm start in server folder)';
+        out.className = 'err';
+      }
+    }
+  </script>
+</body>
+</html>

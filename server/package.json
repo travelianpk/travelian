@@ -1,0 +1,20 @@
+{
+  "name": "travelian-api",
+  "version": "1.0.0",
+  "description": "Travelian Amadeus API backend for flight search and booking",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "amadeus": "^8.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

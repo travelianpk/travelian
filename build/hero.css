@@ -1,0 +1,149 @@
+/* Reusable page hero/banner – same height, overlay, typography, responsive, dynamic background */
+
+.page-hero {
+  --hero-height: 420px;
+  --hero-height-tablet: 280px;
+  --hero-height-mobile: 220px;
+  position: relative;
+  width: 100%;
+  min-height: var(--hero-height);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f1f5f9;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+  .page-hero {
+    min-height: var(--hero-height-tablet);
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-hero {
+    min-height: var(--hero-height-mobile);
+    margin-top: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 12px;
+  }
+}
+
+.page-hero__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: var(--hero-bg-image, none);
+}
+
+.page-hero__bg img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.page-hero__bg video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.page-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.45) 60%, rgba(0, 0, 0, 0.5) 100%);
+  pointer-events: none;
+}
+
+.page-hero__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--hero-height);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .page-hero__content {
+    min-height: var(--hero-height-tablet);
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-hero__content {
+    min-height: var(--hero-height-mobile);
+    padding: 1.25rem 1rem;
+  }
+}
+
+.page-hero__title {
+  font-size: clamp(1.75rem, 4vw + 1rem, 2.5rem);
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  font-family: inherit;
+}
+
+.page-hero__title .page-hero__accent {
+  color: var(--primary-orange, #F2891B);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.page-hero__tagline {
+  font-size: clamp(0.95rem, 1.5vw + 0.6rem, 1.1rem);
+  color: rgba(255, 255, 255, 0.95);
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.5;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Hero with custom content (e.g. search bar) – content can be empty or custom */
+.page-hero .page-hero__content:empty {
+  min-height: 0;
+  padding: 0;
+}
+
+/* When inside .hero (index), allow search bar to sit at bottom */
+.hero .page-hero {
+  margin-bottom: 1rem;
+}
+
+.hero .page-hero__content {
+  justify-content: flex-end;
+  padding-bottom: 6rem;
+}
+
+@media (max-width: 768px) {
+  .hero .page-hero__content {
+    padding-bottom: 4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero .page-hero__content {
+    padding-bottom: 3rem;
+  }
+}
