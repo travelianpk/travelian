@@ -319,12 +319,26 @@
 
     function positionDropdown() {
       var rect = inputEl.getBoundingClientRect();
+      var searchSection = inputEl.closest('.transparent-search-content') || inputEl.closest('.home-flight-search-wrap');
       var fieldContainer = inputEl.closest('.etihad-field-from') || inputEl.closest('.etihad-field-to');
       var anchor = fieldContainer ? fieldContainer.getBoundingClientRect() : rect;
-      var w = Math.min(380, Math.max(280, anchor.width));
-      dropdown.style.left = Math.max(8, Math.min(anchor.left, window.innerWidth - w - 16)) + 'px';
-      dropdown.style.width = w + 'px';
-      dropdown.style.right = 'auto';
+      var w;
+      var left;
+      if (searchSection) {
+        var sectionRect = searchSection.getBoundingClientRect();
+        w = sectionRect.width;
+        dropdown.classList.add('airport-dropdown-fullwidth');
+        dropdown.style.left = sectionRect.left + 'px';
+        dropdown.style.right = (window.innerWidth - sectionRect.right) + 'px';
+        dropdown.style.width = sectionRect.width + 'px';
+      } else {
+        dropdown.classList.remove('airport-dropdown-fullwidth');
+        w = Math.min(380, Math.max(280, anchor.width));
+        left = Math.max(8, Math.min(anchor.left, window.innerWidth - w - 16));
+        dropdown.style.left = left + 'px';
+        dropdown.style.right = 'auto';
+        dropdown.style.width = w + 'px';
+      }
       dropdown.style.top = (rect.bottom + 4) + 'px';
       dropdown.style.maxHeight = 'calc(100vh - ' + (rect.bottom + 24) + 'px)';
     }

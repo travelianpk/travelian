@@ -696,6 +696,9 @@
       box-sizing: border-box;
       overflow-y: auto; overflow-x: hidden;
       width: 380px; min-width: 320px; max-width: 420px; min-height: 120px;
+    }
+    .airport-dropdown-transparent.airport-dropdown-fullwidth {
+      min-width: 0 !important; max-width: none !important;
       background: #fff;
       border: 1px solid rgba(229, 231, 235, 0.95);
       border-radius: 12px;
@@ -1313,6 +1316,12 @@
         function onFieldFocus() {
           scrollForDropdownView();
           setTimeout(scrollForDropdownView, 180);
+          setTimeout(function() {
+            var target = window.scrollY + 270;
+            window.scrollTo(0, target);
+            document.documentElement.scrollTop = target;
+            document.body.scrollTop = target;
+          }, 100);
         }
         var fields = [
           'transparent-txtOriginFull-home', 'transparent-txtDestinationFull-home',
@@ -1328,6 +1337,8 @@
         document.querySelectorAll('.hero .etihad-field-dates label, .hero .etihad-field-from label, .hero .etihad-field-to label, .hero .etihad-field-guests label').forEach(function(lab) {
           lab.addEventListener('click', function() { setTimeout(onFieldFocus, 50); });
         });
+        var form = document.getElementById('transparent-search-form-home');
+        if (form) form.addEventListener('focusin', function(e) { if (e.target.matches('input, select, [role="combobox"]')) onFieldFocus(); });
       })();
 
       // Tab switching functionality
@@ -1460,6 +1471,22 @@
           if (!fromInput || !toInput) return;
           window.setupAirportAutocomplete(fromInput, 'transparent-origin-home', 'from');
           window.setupAirportAutocomplete(toInput, 'transparent-destination-home', 'to');
+function scrollForDropdown(elId) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+
+  setTimeout(function () {
+    var rect = el.getBoundingClientRect();
+    var targetTop = window.scrollY + rect.top - 400;
+
+    window.scrollTo({
+      top: targetTop,
+      behavior: "smooth"
+    });
+  }, 300); // 👈 increase delay to override autocomplete
+}
+          fromInput.addEventListener('focus', function() { scrollForDropdown('originContainer'); });
+          toInput.addEventListener('focus', function() { scrollForDropdown('destContainer'); });
           fromInput.addEventListener('change', function() {
             if ((fromInput.value || '').trim() && toInput) setTimeout(function() { toInput.focus(); }, 80);
           });
@@ -4934,19 +4961,22 @@
           forceScrollTop();
         }
       });
-      // Ensure scroll position is reset after page load
+      // Ensure scroll position is reset after page load (skip if user focused search – they may have triggered scroll)
       window.addEventListener('load',function(){
         setTimeout(function(){
-          if(window.scrollY>0&&!window.location.hash){
+          var active = document.activeElement;
+          var isSearchField = active && (active.id && (active.id.includes('Origin') || active.id.includes('Destination') || active.id.includes('depart') || active.id.includes('passenger')));
+          if(window.scrollY>0&&!window.location.hash&&!isSearchField){
             forceScrollTop();
           }
         },0);
       });
-      // Use requestAnimationFrame to ensure scroll stays at top
+      // Use requestAnimationFrame to ensure scroll stays at top (only on initial load, not when user has focused a field)
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){
-          forceScrollTop();
-          // Re-enable smooth scrolling after ensuring we're at top
+          var active = document.activeElement;
+          var isSearchField = active && active.id && (active.id.includes('Origin') || active.id.includes('Destination') || active.id.includes('depart') || active.id.includes('passenger'));
+          if(!isSearchField) forceScrollTop();
           setTimeout(function(){
             document.documentElement.style.scrollBehavior='smooth';
           },100);
