@@ -319,17 +319,12 @@
 
     function positionDropdown() {
       var rect = inputEl.getBoundingClientRect();
-      var searchArea = inputEl.closest('.transparent-home-search') || inputEl.closest('.transparent-flight-search');
-      if (searchArea) {
-        var sa = searchArea.getBoundingClientRect();
-        dropdown.style.left = sa.left + 'px';
-        dropdown.style.width = Math.min(380, Math.max(320, sa.width)) + 'px';
-        dropdown.style.right = 'auto';
-      } else {
-        dropdown.style.left = Math.max(16, Math.min(rect.left, window.innerWidth - 396)) + 'px';
-        dropdown.style.width = '380px';
-        dropdown.style.right = 'auto';
-      }
+      var fieldContainer = inputEl.closest('.etihad-field-from') || inputEl.closest('.etihad-field-to');
+      var anchor = fieldContainer ? fieldContainer.getBoundingClientRect() : rect;
+      var w = Math.min(380, Math.max(280, anchor.width));
+      dropdown.style.left = Math.max(8, Math.min(anchor.left, window.innerWidth - w - 16)) + 'px';
+      dropdown.style.width = w + 'px';
+      dropdown.style.right = 'auto';
       dropdown.style.top = (rect.bottom + 4) + 'px';
       dropdown.style.maxHeight = 'calc(100vh - ' + (rect.bottom + 24) + 'px)';
     }
