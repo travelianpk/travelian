@@ -964,10 +964,18 @@
     }
     @media (max-width: 768px) {
       .hero { overflow-x: hidden; overflow-y: visible; }
+      /* Shorter banner so search fits above fold */
+      .hero .page-hero.hero-banner .page-hero__bg,
+      .hero .page-hero.hero-banner .page-hero__bg img {
+        max-height: 200px;
+        object-fit: cover;
+        object-position: center;
+      }
+      .hero .page-hero.hero-banner { padding-bottom: 10rem; min-height: 0; }
       .hero .home-flight-search-wrap {
         width: calc(100% - 1rem);
         max-width: calc(100vw - 1rem);
-        top: 85%;
+        top: 72%;
         left: 50%;
         transform: translate(-50%, -50%);
         padding: 0;
@@ -978,15 +986,18 @@
       .etihad-fields-row { flex-direction: column !important; flex-wrap: wrap !important; }
       .etihad-field { flex: 1 1 100% !important; min-width: 100% !important; }
       .etihad-swap-btn { align-self: center; }
-      .hero .page-hero.hero-banner { padding-bottom: 8rem; }
     }
     @media (max-width: 480px) {
+      .hero .page-hero.hero-banner .page-hero__bg,
+      .hero .page-hero.hero-banner .page-hero__bg img {
+        max-height: 160px;
+      }
+      .hero .page-hero.hero-banner { padding-bottom: 10rem; }
       .hero .home-flight-search-wrap {
         width: calc(100% - 0.75rem);
         max-width: calc(100vw - 0.75rem);
-        top: 80%;
+        top: 68%;
       }
-      .hero .page-hero.hero-banner { padding-bottom: 8rem; }
     }
     
     /* Why Choose Travelian – below hero/search, never overlaps */
