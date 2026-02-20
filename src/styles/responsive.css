@@ -1,0 +1,14 @@
+/* Mobile menu overlay – applies to all pages */
+@media (max-width: 768px) {
+  .main-header.nav-open::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+  }
+  .main-header.nav-open .header-nav-right {
+    background: #fff !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+}
