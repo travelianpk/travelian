@@ -300,7 +300,7 @@
     if (!container) container = inputEl.parentElement;
 
     var dropdown = document.createElement('div');
-    dropdown.className = 'airport-dropdown airport-dropdown-transparent' + (fromOrTo === 'from' ? ' airport-dropdown-from' : '');
+    dropdown.className = 'airport-dropdown airport-dropdown-transparent airport-dropdown-from';
     dropdown.setAttribute('aria-expanded', 'false');
     document.body.appendChild(dropdown);
 
@@ -387,7 +387,7 @@
     inputEl.addEventListener('mousedown', function() {
       setTimeout(onOpenDropdown, 0);
     }, { passive: true });
-    var typeaheadContainer = inputEl.closest('.ey-typeahead--container-ond--fsp') || inputEl.closest('#originContainer') || container;
+    var typeaheadContainer = inputEl.closest('.ey-typeahead--container-ond--fsp') || inputEl.closest('#originContainer') || inputEl.closest('#destContainer') || container;
     if (typeaheadContainer && typeaheadContainer !== inputEl) {
       typeaheadContainer.addEventListener('mousedown', function(e) {
         if (e.target === inputEl || inputEl.contains(e.target)) return;
