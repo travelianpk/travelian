@@ -1811,24 +1811,24 @@ function scrollForDropdown(elId) {
               Book Flights
             </a>
           </div>
-          <div class="transparent-tab-col tab-disabled" data-tab="groupticketing" data-disabled="true" title="Coming soon">
+          <!-- <div class="transparent-tab-col tab-disabled" data-tab="groupticketing" data-disabled="true" title="Coming soon">
             <span class="transparent-tab-link">
               <span class="icon plane"><i class="fa-solid fa-plane"></i></span>
               Group Ticketing
             </span>
-          </div>
-          <div class="transparent-tab-col tab-disabled" data-tab="hotels" data-disabled="true" title="Coming soon">
+          </div> -->
+          <!-- <div class="transparent-tab-col tab-disabled" data-tab="hotels" data-disabled="true" title="Coming soon">
             <span class="transparent-tab-link">
               <span class="icon hotel"><i class="fa-solid fa-hotel"></i></span>
               HOTEL BOOKING
             </span>
-          </div>
-          <div class="transparent-tab-col tab-disabled" data-tab="insurance" data-disabled="true" title="Coming soon">
+          </div> -->
+          <!-- <div class="transparent-tab-col tab-disabled" data-tab="insurance" data-disabled="true" title="Coming soon">
             <span class="transparent-tab-link">
               <span class="icon insurance"><i class="fa-solid fa-shield-halved"></i></span>
               Buy Travel Insurance
             </span>
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="transparent-search-content">
@@ -5025,6 +5025,43 @@ function scrollForDropdown(elId) {
   <button type="button" id="scroll-to-top" aria-label="Scroll to top">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
   </button>
+  <a
+    href="https://wa.me/923244440014"
+    id="whatsapp-float-btn"
+    aria-label="Chat on WhatsApp"
+    title="WhatsApp"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+  </a>
+  <style>
+    #whatsapp-float-btn {
+      position: fixed;
+      right: calc(16px + env(safe-area-inset-right));
+      bottom: calc(76px + env(safe-area-inset-bottom));
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #25d366;
+      color: #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
+      z-index: 998;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    #whatsapp-float-btn i { font-size: 1.45rem; line-height: 1; }
+    #whatsapp-float-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 10px 24px rgba(37, 211, 102, 0.5);
+    }
+    @media (max-width: 768px) {
+      #whatsapp-float-btn { display: inline-flex; }
+    }
+  </style>
   <script>
     (function(){
       // Prevent browser scroll restoration
