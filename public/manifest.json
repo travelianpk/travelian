@@ -1,0 +1,27 @@
+{
+  "name": "Travelian – TRAVEL, TOURS & BEYOND",
+  "short_name": "Travelian",
+  "description": "Book flights, Umrah packages, visit & study visas, hotel bookings and travel insurance with Travelian. Trusted travel agency in Pakistan.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#F2891B",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/src/assets/images/smfavicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/src/assets/images/smfavicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "business"],
+  "lang": "en-US",
+  "dir": "ltr"
+}

@@ -35,19 +35,24 @@ const AMADEUS_TEST_HOST = 'https://test.api.amadeus.com';
 
 const AVIATIONSTACK_ACCESS_KEY = process.env.AVIATIONSTACK_ACCESS_KEY || '';
 
-// Log config on startup (hide secrets)
-console.log('Amadeus host:', AMADEUS_HOST);
-console.log('Client ID set:', !!AMADEUS_CLIENT_ID && AMADEUS_CLIENT_ID !== 'YOUR_API_KEY');
-console.log('AviationStack key set:', !!AVIATIONSTACK_ACCESS_KEY);
-
 app.use(express.json());
 app.use(cors({ origin: true, methods: ['GET', 'POST'], allowedHeaders: ['Content-Type'] }));
 
 // Serve main site from parent folder (open http://localhost:5000/)
 const staticRoot = join(__dirname, '..');
 app.get('/', (req, res) => res.sendFile(join(staticRoot, 'index.html')));
-app.get('/about.html', (req, res) => res.sendFile(join(staticRoot, 'about.html')));
-app.get('/flight-results.html', (req, res) => res.sendFile(join(staticRoot, 'flight-results.html')));
+app.get('/about.html', (req, res) => res.sendFile(join(staticRoot, 'src', 'pages', 'about.html')));
+app.get('/contact-us.html', (req, res) => res.sendFile(join(staticRoot, 'src', 'pages', 'contact-us.html')));
+app.get('/flight-results.html', (req, res) => res.sendFile(join(staticRoot, 'src', 'pages', 'flight-results.html')));
+app.get('/hotel-bookings.html', (req, res) => res.sendFile(join(staticRoot, 'src', 'pages', 'hotel-bookings.html')));
+app.get('/study-visa.html', (req, res) => res.sendFile(join(staticRoot, 'src', 'pages', 'study-visa.html')));
+app.get('/travel-insurance.html', (req, res) => res.sendFile(join(staticRoot, 'src', 'pages', 'travel-insurance.html')));
+app.get('/umrah-packages.html', (req, res) => res.sendFile(join(staticRoot, 'src', 'pages', 'umrah-packages.html')));
+app.get('/visit-visa.html', (req, res) => res.sendFile(join(staticRoot, 'src', 'pages', 'visit-visa.html')));
+app.get('/robots.txt', (req, res) => res.sendFile(join(staticRoot, 'public', 'robots.txt')));
+app.get('/sitemap.xml', (req, res) => res.sendFile(join(staticRoot, 'public', 'sitemap.xml')));
+app.get('/favicon.ico', (req, res) => res.sendFile(join(staticRoot, 'public', 'favicon.png')));
+app.get('/manifest.json', (req, res) => res.sendFile(join(staticRoot, 'public', 'manifest.json')));
 app.use(express.static(staticRoot));
 
 // Get OAuth token (optional baseUrl – defaults to AMADEUS_HOST)
@@ -177,7 +182,7 @@ app.get('/api/city-and-airport-search/:parameter', async (req, res) => {
       return res.json({ data: items });
     }
   } catch (err) {
-    if (err && err.data) console.warn('[Airport search] Amadeus failed, using static list:', err.data.error_description || err.data.error);
+    if (err && err.data) { /* Amadeus failed, using static list */ }
   }
 
   return res.status(200).json({ data: fallbackData() });
@@ -451,7 +456,6 @@ app.get('/api/flight-search', async (req, res) => {
     res.set('Pragma', 'no-cache');
     res.set('Expires', '0');
     const demo = getDemoFlights(originCode, destinationCode, dateOfDeparture, returnDate || null, adults, direct);
-    console.log('[flight-search] Demo: returning', demo.data.length, 'flights (Return:', !!returnDate, ')');
     return res.json(demo);
   }
 
@@ -472,7 +476,6 @@ app.get('/api/flight-search', async (req, res) => {
       const r = await fetch(url);
       const avData = await r.json();
       if (avData.error) {
-        console.warn('[AviationStack]', avData.error.code, avData.error.message);
       } else if (r.ok && avData.data && avData.data.length > 0) {
         // Filter to requested date (real-time returns all live flights; match today's date)
         const filtered = avData.data.filter(f => (f.flight_date || '').slice(0, 10) === dateOfDeparture);
@@ -480,17 +483,13 @@ app.get('/api/flight-search', async (req, res) => {
         const result = aviationStackToAmadeusFormat(toConvert, originCode, destinationCode, dateOfDeparture, returnDate, adults);
         if (result && result.data.length > 0) {
           res.set('Cache-Control', 'no-store, no-cache');
-          console.log('[flight-search] AviationStack: returning', result.data.length, 'real flights');
           return res.json(direct ? filterDirectFlights(result) : result);
         }
       } else {
-        console.log('[AviationStack] No flights for', originCode, '->', destinationCode, 'on', dateOfDeparture);
       }
     } catch (err) {
-      console.warn('[AviationStack ERROR]', err.message);
     }
   } else if (AVIATIONSTACK_ACCESS_KEY && !isToday) {
-    console.log('[flight-search] AviationStack skipped: free tier only supports today (' + today + '), requested', dateOfDeparture);
   }
 
   // Fallback to Amadeus
@@ -510,7 +509,6 @@ app.get('/api/flight-search', async (req, res) => {
     const data = await r.json();
 
     if (!r.ok) {
-      console.warn('[Amadeus FAILED] Using demo data. Error:', r.status, data.errors?.[0]?.detail || data);
       res.set('Cache-Control', 'no-store, no-cache');
       const demo = getDemoFlights(originCode, destinationCode, dateOfDeparture, returnDate || null, adults, direct);
       return res.json(demo);
@@ -519,7 +517,6 @@ app.get('/api/flight-search', async (req, res) => {
     const result = direct ? filterDirectFlights(data) : data;
     res.json(result);
   } catch (err) {
-    console.warn('[Amadeus ERROR] Using demo data.', err.message);
     res.set('Cache-Control', 'no-store, no-cache');
     const demo = getDemoFlights(originCode, destinationCode, dateOfDeparture, req.query.returnDate || null, adults, direct);
     res.json(demo);
@@ -626,8 +623,6 @@ app.get('/api/test-amadeus', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Travelian API running at http://localhost:${PORT}`);
   if (!process.env.AMADEUS_CLIENT_ID || !process.env.AMADEUS_CLIENT_SECRET) {
-    console.warn('⚠️  Set AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET in .env file');
   }
 });

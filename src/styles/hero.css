@@ -1,0 +1,135 @@
+.page-hero {
+    --hero-height: 420px;
+    --hero-height-tablet: 280px;
+    --hero-height-mobile: 220px;
+    margin-top: -72px;
+    padding: 0;
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-bottom: 0;
+    box-sizing: border-box
+}
+
+.page-hero__bg {
+    position: relative;
+    line-height: 0;
+    padding: 0;
+    margin: 0
+}
+
+.page-hero__bg img {
+    position: relative;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    display: block;
+    vertical-align: middle;
+    object-position: center center;
+    top: 0;
+    left: 0;
+    right: 0
+}
+
+.hero .page-hero__bg {
+    z-index: 0
+}
+
+.hero .page-hero__overlay {
+    z-index: 1
+}
+
+.page-hero__bg video {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    display: block
+}
+
+.page-hero__overlay {
+    display: none
+}
+
+.page-hero__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--hero-height);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-sizing: border-box
+}
+
+@media (max-width:768px) {
+    .page-hero {
+        margin-top: -68px
+    }
+
+    .page-hero__content {
+        min-height: var(--hero-height-tablet);
+        padding: 1.5rem 1rem
+    }
+}
+
+@media (max-width:480px) {
+    .page-hero__content {
+        min-height: var(--hero-height-mobile);
+        padding: 1.25rem 1rem
+    }
+}
+
+.page-hero__title {
+    font-size: clamp(1.75rem, 4vw + 1rem, 2.5rem);
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 .5rem;
+    line-height: 1.2;
+    letter-spacing: -.02em;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, .4);
+    font-family: inherit
+}
+
+.page-hero__title .page-hero__accent {
+    color: var(--primary-orange, #f2891b);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, .35)
+}
+
+.page-hero__tagline {
+    font-size: clamp(.95rem, 1.5vw + .6rem, 1.1rem);
+    color: rgba(255, 255, 255, .95);
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.5;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, .4)
+}
+
+.page-hero .page-hero__content:empty {
+    min-height: 0;
+    padding: 0
+}
+
+.hero .page-hero.hero-banner {
+    margin-top: -72px !important;
+    margin-bottom: 0
+}
+
+.page-hero+*,
+.page-hero+section,
+main .page-hero+section {
+    margin-top: 0 !important;
+    padding-top: 0 !important
+}
+
+.hero .page-hero.hero-banner .page-hero__content {
+    justify-content: center;
+    padding: 2rem 1.5rem
+}
+
+.page-hero {
+    position: relative;
+    overflow: hidden
+}

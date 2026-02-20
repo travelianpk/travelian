@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Disallow admin/private areas if any
+Disallow: /api/
+Disallow: /server/
+
+# Sitemap location
+Sitemap: https://www.travelian.pk/sitemap.xml

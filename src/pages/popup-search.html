@@ -1,0 +1,129 @@
+<!-- POPUP FLIGHT SEARCH MODAL -->
+<div class="transparent-flight-search-overlay" id="transparent-search-overlay"></div>
+<section class="transparent-flight-search popup-mode" aria-label="Flight search popup" id="transparent-flight-search-modal">
+  <button class="transparent-flight-search-close" id="transparent-search-close" aria-label="Close search">
+    <i class="fa-solid fa-times"></i>
+  </button>
+  <div class="transparent-search-tabs">
+    <div class="transparent-tab-row">
+      <div class="transparent-tab-col active" data-tab="flight">
+        <a href="#flights-popup" class="transparent-tab-link">
+          <span class="icon plane"><i class="fa-solid fa-plane"></i></span>
+          BOOK A FLIGHT
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="transparent-search-content">
+    <!-- BOOK A FLIGHT Tab Content -->
+    <div id="flights-popup" class="transparent-tab-content active">
+      <form id="transparent-search-form-popup">
+        <input type="hidden" id="transparent-origin-popup" name="origin" autocomplete="off">
+        <input type="hidden" id="transparent-destination-popup" name="destination" autocomplete="off">
+        <input type="hidden" id="departure-popup" name="departure-popup" value="">
+        <input type="hidden" id="return-date-popup" name="return-date-popup" value="">
+        <div class="transparent-compact-search">
+          <!-- Trip Type Radio Buttons -->
+          <div class="transparent-trip-type-row">
+            <label class="transparent-trip-type-option">
+              <input type="radio" name="trip-popup" value="oneway" id="trip-oneway-popup" checked>
+              <span>One Way</span>
+            </label>
+            <label class="transparent-trip-type-option">
+              <input type="radio" name="trip-popup" value="return" id="trip-return-popup">
+              <span>Round Trip</span>
+            </label>
+            <label class="transparent-trip-type-option">
+              <input type="radio" name="trip-popup" value="multicity" id="trip-multicity-popup">
+              <span>Multicity</span>
+            </label>
+          </div>
+          <div class="transparent-form-row">
+            <div class="transparent-search-field transparent-input-container">
+              <input id="transparent-txtOriginFull-popup" type="text" class="transparent-input select-field" placeholder="" name="txtOriginFull" autocomplete="off">
+              <label for="transparent-txtOriginFull-popup">
+                <span class="label">From</span>
+              </label>
+              <span class="icon-right"><i class="fa-solid fa-list"></i></span>
+              <span class="validation-error-msg" role="alert"></span>
+            </div>
+            <div class="transparent-search-field transparent-input-container">
+              <input id="transparent-txtDestinationFull-popup" type="text" class="transparent-input select-field" placeholder="" name="txtDestinationFull" autocomplete="off">
+              <label for="transparent-txtDestinationFull-popup">
+                <span class="label">To</span>
+              </label>
+              <span class="icon-right"><i class="fa-solid fa-list"></i></span>
+              <span class="validation-error-msg" role="alert"></span>
+            </div>
+            <div class="transparent-search-field transparent-input-container">
+              <input id="transparent-depart-date-popup" type="text" class="transparent-input select-field" placeholder="" name="departDate" autocomplete="off" readonly>
+              <label for="transparent-depart-date-popup">
+                <span class="label">Depart Date</span>
+              </label>
+              <span class="icon-right"><i class="fa-solid fa-calendar-days"></i></span>
+              <span class="validation-error-msg" role="alert"></span>
+            </div>
+          </div>
+          <div class="transparent-form-row">
+            <div class="transparent-search-field transparent-input-container">
+              <input id="transparent-return-date-popup" type="text" class="transparent-input select-field" placeholder="" name="returnDate" autocomplete="off" readonly>
+              <label for="transparent-return-date-popup">
+                <span class="label">Return Date</span>
+              </label>
+              <span class="icon-right"><i class="fa-solid fa-calendar-days"></i></span>
+              <span class="validation-error-msg" role="alert"></span>
+            </div>
+            <div class="transparent-search-field transparent-input-container">
+              <input id="transparent-passengers-popup" type="text" class="transparent-input select-field" placeholder="" name="passengers" value="" autocomplete="off" readonly>
+              <label for="transparent-passengers-popup">
+                <span class="label">1 Adult</span>
+              </label>
+              <span class="icon-right"><i class="fa-solid fa-chevron-down"></i></span>
+              <span class="validation-error-msg" role="alert"></span>
+            </div>
+            <div class="transparent-search-field transparent-search-btn-container">
+              <button type="submit" class="transparent-search-btn">SEARCH</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Passengers Dropdown for Popup -->
+<div id="transparent-passengers-dropdown" class="transparent-passengers-dropdown" role="dialog">
+  <div class="transparent-passengers-row" data-type="adult">
+    <div class="transparent-passengers-label-wrap">
+      <span class="transparent-passengers-label">Adult</span>
+      <span class="transparent-passengers-sublabel">12+ Years</span>
+    </div>
+    <div class="transparent-passengers-controls">
+      <button type="button" class="transparent-passengers-btn transparent-passengers-minus" id="pax-adult-minus-popup" aria-label="Decrease adults">−</button>
+      <span class="transparent-passengers-count" id="pax-adult-val-popup">1</span>
+      <button type="button" class="transparent-passengers-btn transparent-passengers-plus" id="pax-adult-plus-popup" aria-label="Increase adults">+</button>
+    </div>
+  </div>
+  <div class="transparent-passengers-row" data-type="child">
+    <div class="transparent-passengers-label-wrap">
+      <span class="transparent-passengers-label">Children</span>
+      <span class="transparent-passengers-sublabel">2-11 years</span>
+    </div>
+    <div class="transparent-passengers-controls">
+      <button type="button" class="transparent-passengers-btn transparent-passengers-minus" id="pax-child-minus-popup" aria-label="Decrease children">−</button>
+      <span class="transparent-passengers-count" id="pax-child-val-popup">0</span>
+      <button type="button" class="transparent-passengers-btn transparent-passengers-plus" id="pax-child-plus-popup" aria-label="Increase children">+</button>
+    </div>
+  </div>
+  <div class="transparent-passengers-row" data-type="infant">
+    <div class="transparent-passengers-label-wrap">
+      <span class="transparent-passengers-label">Infants</span>
+      <span class="transparent-passengers-sublabel">Under 2 years</span>
+    </div>
+    <div class="transparent-passengers-controls">
+      <button type="button" class="transparent-passengers-btn transparent-passengers-minus" id="pax-infant-minus-popup" aria-label="Decrease infants">−</button>
+      <span class="transparent-passengers-count" id="pax-infant-val-popup">0</span>
+      <button type="button" class="transparent-passengers-btn transparent-passengers-plus" id="pax-infant-plus-popup" aria-label="Increase infants">+</button>
+    </div>
+  </div>
+</div>
