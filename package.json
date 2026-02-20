@@ -1,0 +1,36 @@
+{
+  "name": "travelian",
+  "version": "1.0.0",
+  "description": "",
+  "main": "filter-csvs.js",
+  "dependencies": {
+    "acorn": "^8.15.0",
+    "buffer-from": "^1.1.2",
+    "clean-css": "^5.3.3",
+    "commander": "^2.20.3",
+    "detect-libc": "^2.1.2",
+    "semver": "^7.7.3",
+    "source-map": "^0.6.1",
+    "source-map-support": "^0.5.21",
+    "terser": "^5.46.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "optimize-banners": "node scripts/optimize-banners.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/travelianpk/travelian.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/travelianpk/travelian/issues"
+  },
+  "homepage": "https://github.com/travelianpk/travelian#readme"
+}

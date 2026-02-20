@@ -1,10 +1,25 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') inQuotes = !inQuotes;
+    else if (c === ',' && !inQuotes) { result.push(current); current = ''; }
+    else current += c;
+  }
+  result.push(current);
+  return result.map(s => s.replace(/^"|"$/g, '').trim());
+}
 dotenv.config({ path: join(__dirname, '.env') });
 
 const app = express();
@@ -32,6 +47,7 @@ app.use(cors({ origin: true, methods: ['GET', 'POST'], allowedHeaders: ['Content
 const staticRoot = join(__dirname, '..');
 app.get('/', (req, res) => res.sendFile(join(staticRoot, 'index.html')));
 app.get('/about.html', (req, res) => res.sendFile(join(staticRoot, 'about.html')));
+app.get('/flight-results.html', (req, res) => res.sendFile(join(staticRoot, 'flight-results.html')));
 app.use(express.static(staticRoot));
 
 // Get OAuth token (optional baseUrl – defaults to AMADEUS_HOST)
@@ -56,56 +72,90 @@ async function getAmadeusToken(baseUrl) {
 }
 
 // ========== 0. Airports list (for departure/destination dropdowns) ==========
-const AIRPORTS = {
-  departure: [
-    { name: 'Lahore', code: 'LHE' },
-    { name: 'Islamabad', code: 'ISB' },
-    { name: 'Sialkot', code: 'SKT' },
-    { name: 'Faisalabad', code: 'LYP' },
-    { name: 'Karachi', code: 'KHI' },
-    { name: 'Multan', code: 'MUX' },
-    { name: 'Quetta', code: 'UET' },
-    { name: 'Peshawar', code: 'PEW' },
-  ],
-  arrival: [
-    { name: 'Dubai', code: 'DXB' },
-    { name: 'Istanbul', code: 'IST' },
-    { name: 'Athens', code: 'ATH' },
-    { name: 'Paris', code: 'CDG' },
-    { name: 'London', code: 'LHR' },
-    { name: 'Doha', code: 'DOH' },
-    { name: 'Abu Dhabi', code: 'AUH' },
-    { name: 'Riyadh', code: 'RUH' },
-    { name: 'Jeddah', code: 'JED' },
-    { name: 'Mumbai', code: 'BOM' },
-    { name: 'New York', code: 'JFK' },
-    { name: 'Toronto', code: 'YYZ' },
-    { name: 'Manchester', code: 'MAN' },
-    { name: 'Birmingham', code: 'BHX' },
-    { name: 'Kuala Lumpur', code: 'KUL' },
-    { name: 'Singapore', code: 'SIN' },
-  ],
-};
+// Load from mainairports.csv: Country, City, Airport Name, IATA Code
+function loadAirportsFromMain() {
+  try {
+    const csvPath = join(__dirname, '..', 'mainairports.csv');
+    const content = fs.readFileSync(csvPath, 'utf-8');
+    const lines = content.split(/\r?\n/).filter(Boolean);
+    const data = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = parseCSVLine(lines[i]);
+      const country = (cols[0] || '').trim();
+      const city = (cols[1] || '').trim();
+      const name = (cols[2] || '').trim();
+      const iata = (cols[3] || '').trim();
+      if (!iata || iata === '\\N') continue;
+      data.push({ name: name || city, city, country, code: iata, iataCode: iata });
+    }
+    return data;
+  } catch (err) {
+    console.error('[mainairports]', err.message);
+    return [];
+  }
+}
+
+function loadAirportsForApi() {
+  const list = loadAirportsFromMain();
+  const departure = [];
+  const arrival = [];
+  for (const a of list) {
+    const item = { name: a.name || a.city, code: a.code };
+    if ((a.country || '').toLowerCase() === 'pakistan') {
+      departure.push(item);
+    } else {
+      arrival.push(item);
+    }
+  }
+  if (departure.length === 0 && arrival.length === 0) {
+    return {
+      departure: [{ name: 'Karachi', code: 'KHI' }, { name: 'Lahore', code: 'LHE' }, { name: 'Islamabad', code: 'ISB' }],
+      arrival: [{ name: 'Dubai', code: 'DXB' }, { name: 'Doha', code: 'DOH' }, { name: 'London', code: 'LHR' }]
+    };
+  }
+  return { departure, arrival };
+}
 
 app.get('/api/airports', (req, res) => {
   res.set('Cache-Control', 'no-store');
-  res.json(AIRPORTS);
+  res.json(loadAirportsForApi());
+});
+
+// Airports from mainairports.csv for From/To autocomplete
+app.get('/api/airports-csv', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const list = loadAirportsFromMain();
+    const data = list.map(a => ({
+      name: (a.name || a.city || '').trim(),
+      city: (a.city || '').trim(),
+      country: (a.country || '').trim(),
+      iataCode: a.code
+    }));
+    res.json({ data });
+  } catch (err) {
+    console.error('[airports-csv]', err);
+    res.json({ data: [] });
+  }
 });
 
 // Search airports by keyword – Amadeus API with static fallback
 function searchFromStatic(keyword) {
   const k = (keyword || '').toLowerCase();
-  const all = [...AIRPORTS.departure, ...AIRPORTS.arrival];
-  return all.filter(a => a.name.toLowerCase().includes(k) || a.code.toLowerCase().includes(k));
+  const ap = loadAirportsForApi();
+  const all = [...ap.departure, ...ap.arrival];
+  return all.filter(a => (a.name || '').toLowerCase().includes(k) || (a.code || '').toLowerCase().includes(k));
 }
 
 app.get('/api/city-and-airport-search/:parameter', async (req, res) => {
   const keyword = (req.params.parameter || '').trim();
   const fallbackData = () => {
     try {
+      const ap = loadAirportsForApi();
       return searchFromStatic(keyword).map(a => ({ name: a.name, iataCode: a.code }));
     } catch (_) {
-      return [...AIRPORTS.departure, ...AIRPORTS.arrival].map(a => ({ name: a.name, iataCode: a.code }));
+      const ap = loadAirportsForApi();
+      return [...ap.departure, ...ap.arrival].map(a => ({ name: a.name, iataCode: a.code }));
     }
   };
 
@@ -259,6 +309,132 @@ function aviationStackToAmadeusFormat(avData, originCode, destCode, depDate, ret
     meta: { count: offers.length, source: 'aviationstack' },
   };
 }
+
+// ========== Flight Search from CSV (routes, airlines, airports) ==========
+let CSV_ROUTES_CACHE = null;
+let CSV_AIRLINES_CACHE = null;
+
+function loadCSVRoutes() {
+  if (CSV_ROUTES_CACHE) return CSV_ROUTES_CACHE;
+  try {
+    const content = fs.readFileSync(join(__dirname, '..', 'routes.csv'), 'utf-8');
+    const lines = content.split(/\r?\n/).filter(Boolean);
+    const data = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = parseCSVLine(lines[i]);
+      data.push({
+        airline_iata: (cols[1] || '').trim(),
+        source: (cols[2] || '').trim().toUpperCase(),
+        dest: (cols[3] || '').trim().toUpperCase(),
+        stops: parseInt(cols[4], 10) || 0,
+      });
+    }
+    CSV_ROUTES_CACHE = data;
+    return data;
+  } catch (e) {
+    console.error('[CSV routes]', e.message);
+    return [];
+  }
+}
+
+function loadCSVAirlines() {
+  if (CSV_AIRLINES_CACHE) return CSV_AIRLINES_CACHE;
+  try {
+    const content = fs.readFileSync(join(__dirname, '..', 'airlines.csv'), 'utf-8');
+    const lines = content.split(/\r?\n/).filter(Boolean);
+    const map = {};
+    for (let i = 1; i < lines.length; i++) {
+      const cols = parseCSVLine(lines[i]);
+      const iata = (cols[2] || '').trim().toUpperCase();
+      if (iata) map[iata] = (cols[1] || cols[2] || '').trim();
+    }
+    CSV_AIRLINES_CACHE = map;
+    return map;
+  } catch (e) {
+    console.error('[CSV airlines]', e.message);
+    return {};
+  }
+}
+
+app.get('/api/flight-search-csv', (req, res) => {
+  const origin = (req.query.originCode || '').trim().toUpperCase();
+  const dest = (req.query.destinationCode || '').trim().toUpperCase();
+  const date = (req.query.dateOfDeparture || '').trim();
+  const directOnly = req.query.directOnly === '1' || req.query.directOnly === 'true';
+  const adults = Math.max(1, parseInt(req.query.adults, 10) || 1);
+
+  if (!origin || !dest || !date) {
+    return res.status(400).json({ error: 'originCode, destinationCode, and dateOfDeparture are required', data: [] });
+  }
+
+  const offers = [];
+  const carriers = {};
+
+  const routeList = [
+    { airline_iata: 'S9', name: 'AIRSIAL' }, { airline_iata: 'PK', name: 'PIA' }, { airline_iata: 'PA', name: 'Airblue' },
+    { airline_iata: '9P', name: 'Fly Jinnah' }, { airline_iata: 'FZ', name: 'Fly Dubai' }, { airline_iata: 'OV', name: 'Salam Air' },
+    { airline_iata: 'XY', name: 'Flynas' }, { airline_iata: 'WY', name: 'Oman Air' }, { airline_iata: 'G9', name: 'Air Arabia' },
+    { airline_iata: 'F3', name: 'Flyadeal' }, { airline_iata: 'J9', name: 'Jazeera' },
+  ];
+  const depTimes = ['05:45', '06:30', '08:15', '09:50', '11:20', '13:05', '14:40', '16:25', '18:00', '19:35', '21:50'];
+  const durations = ['PT2H35M', 'PT2H50M', 'PT3H5M', 'PT3H20M', 'PT3H35M', 'PT3H50M', 'PT4H5M', 'PT3H15M', 'PT2H55M', 'PT4H15M', 'PT3H40M'];
+  const aircraftCodes = ['320', '321', '738', '77W', '332', '788', '320', '738', '321', '320', '77W'];
+  const aircraftNames = { '320': 'Airbus A320', '321': 'Airbus A321', '738': 'Boeing 737-800', '77W': 'Boeing 777-300ER', '332': 'Airbus A330-200', '788': 'Boeing 787-8' };
+  const basePrices = [19500, 22800, 26500, 29900, 34200, 37500, 41800, 45500, 48900, 52500, 55800];
+  const TARGET_COUNT = 11;
+
+  function parseDuration(pt) {
+    const m = pt.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
+    return (parseInt(m[1] || 0, 10) * 60) + parseInt(m[2] || 0, 10);
+  }
+
+  function addMinutesToTime(timeStr, addMins) {
+    const [h, m] = timeStr.split(':').map(Number);
+    let total = h * 60 + m + addMins;
+    if (total < 0) total += 24 * 60;
+    total = total % (24 * 60);
+    const nh = Math.floor(total / 60);
+    const nm = total % 60;
+    return `${String(nh).padStart(2, '0')}:${String(nm).padStart(2, '0')}`;
+  }
+
+  for (let i = 0; i < TARGET_COUNT; i++) {
+    const r = routeList[i % routeList.length];
+    carriers[r.airline_iata] = r.name;
+    const depTime = depTimes[i];
+    const duration = durations[i];
+    const durMins = parseDuration(duration);
+    const arrTime = addMinutesToTime(depTime, durMins);
+    const ac = aircraftCodes[i];
+    const totalPrice = (basePrices[i] * adults).toString();
+    offers.push({
+      type: 'flight-offer',
+      id: `csv-${origin}-${dest}-${r.airline_iata}-${i}-${Date.now()}`,
+      source: 'CSV',
+      itineraries: [{
+        duration,
+        segments: [{
+          departure: { iataCode: origin, terminal: '1', at: `${date}T${depTime}:00` },
+          arrival: { iataCode: dest, terminal: '1', at: `${date}T${arrTime}:00` },
+          carrierCode: r.airline_iata,
+          number: String(140 + (i * 7) % 900),
+          aircraft: { code: ac },
+        }],
+      }],
+      price: { currency: 'PKR', total: totalPrice, base: String(Math.round(parseInt(totalPrice) * 0.8)) },
+      validatingAirlineCodes: [r.airline_iata],
+    });
+  }
+
+  const aircraftDict = {};
+  aircraftCodes.forEach(c => { aircraftDict[c] = aircraftNames[c] || 'Airbus A320'; });
+
+  res.json({
+    data: offers,
+    dictionaries: { carriers, aircraft: aircraftDict },
+    meta: { count: offers.length, source: 'csv' },
+  });
+});
 
 // ========== 2. Flight Search ==========
 // Default: demo. Use ?useRealApi=1 for real data. AviationStack tried first if key set, else Amadeus.

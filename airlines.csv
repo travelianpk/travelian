@@ -1,0 +1,22 @@
+airline_id,name,iata,icao,country,active
+1,Pakistan International Airlines,PK,PIA,Pakistan,Y
+2,Airblue,PA,ABQ,Pakistan,Y
+3,Serene Air,ER,SEP,Pakistan,Y
+4,AirSial,S9,SIL,Pakistan,Y
+5,Fly Jinnah,9P,FJL,Pakistan,Y
+6,Emirates,EK,UAE,United Arab Emirates,Y
+7,Qatar Airways,QR,QTR,Qatar,Y
+8,Etihad Airways,EY,ETD,United Arab Emirates,Y
+9,Turkish Airlines,TK,THY,Turkey,Y
+10,Saudi Arabian Airlines,SV,SVA,Saudi Arabia,Y
+11,Gulf Air,GF,GFA,Bahrain,Y
+12,Oman Air,WY,OMA,Oman,Y
+13,Kuwait Airways,KU,KAC,Kuwait,Y
+14,British Airways,BA,BAW,United Kingdom,Y
+15,Lufthansa,LH,DLH,Germany,Y
+16,Air France,AF,AFR,France,Y
+17,KLM,KL,KLM,Netherlands,Y
+18,Singapore Airlines,SQ,SIA,Singapore,Y
+19,Thai Airways,TG,THA,Thailand,Y
+20,Malaysia Airlines,MH,MAS,Malaysia,Y
+21,Flynas,XY,KNE,Saudi Arabia,Y
