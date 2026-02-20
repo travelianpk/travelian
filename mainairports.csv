@@ -1,0 +1,38 @@
+Country,City,Airport Name,IATA Code
+Pakistan,Islamabad,Islamabad International Airport,ISB
+Pakistan,Karachi,Jinnah International Airport,KHI
+Pakistan,Lahore,Allama Iqbal International Airport,LHE
+Pakistan,Peshawar,Bacha Khan International Airport,PEW
+Pakistan,Sialkot,Sialkot International Airport,SKT
+Pakistan,Multan,Multan International Airport,MUX
+Pakistan,Quetta,Quetta International Airport,UET
+Pakistan,Skardu,Skardu International Airport,KDU
+Pakistan,Faisalabad,Faisalabad International Airport,LYP
+UAE,Dubai,Dubai International Airport,DXB
+UAE,Dubai,Al Maktoum International Airport,DWC
+UAE,Abu Dhabi,Zayed International Airport,AUH
+UAE,Sharjah,Sharjah International Airport,SHJ
+UAE,Ras Al Khaimah,Ras Al Khaimah International Airport,RKT
+UAE,Fujairah,Fujairah International Airport,FJR
+United Kingdom,London,Heathrow Airport,LHR
+United Kingdom,London,Gatwick Airport,LGW
+United Kingdom,Manchester,Manchester Airport,MAN
+United Kingdom,Birmingham,Birmingham Airport,BHX
+United Kingdom,Glasgow,Glasgow Airport,GLA
+United Kingdom,Edinburgh,Edinburgh Airport,EDI
+Oman,Muscat,Muscat International Airport,MCT
+Oman,Salalah,Salalah Airport,SLL
+Oman,Duqm,Duqm International Airport,DQM
+Qatar,Doha,Hamad International Airport,DOH
+Kuwait,Kuwait City,Kuwait International Airport,KWI
+Turkey,Istanbul,Istanbul Airport,IST
+Turkey,Istanbul,Sabiha Gokcen International Airport,SAW
+Turkey,Ankara,Esenboga International Airport,ESB
+Turkey,Antalya,Antalya Airport,AYT
+Turkey,Izmir,Adnan Menderes Airport,ADB
+Saudi Arabia,Riyadh,King Khalid International Airport,RUH
+Saudi Arabia,Jeddah,King Abdulaziz International Airport,JED
+Saudi Arabia,Dammam,King Fahd International Airport,DMM
+Saudi Arabia,Madinah,Prince Mohammad bin Abdulaziz Airport,MED
+Saudi Arabia,Abha,Abha International Airport,AHB
+Bahrain,Manama,Bahrain International Airport,BAH

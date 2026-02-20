@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flight Results – Travelian</title>
+  <link rel="icon" href="build/images/smfavicon.png" type="image/png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="build/hero.css?v=20250220" />
+  <style>
+    :root{--primary-orange:#F2891B;--dark-orange:#E97800;--primary-blue:#1F2F7A;--dark-blue:#16235C;--text-dark:#333333;--text-secondary:#374151;--text-muted:#6b7280;--border-light:#e5e7eb;--light-gray:#F5F6F8}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;color:var(--text-dark)}
+    .container{max-width:1200px;margin:0 auto;padding:96px 1.5rem 2rem}
+    .main-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid var(--border-light);padding:.5rem 1rem;height:60px;display:flex;align-items:center;justify-content:space-between}
+    .brand-link{text-decoration:none;color:inherit}
+    .brand-logo{height:50px;display:block}
+    .nav-menu{display:flex;gap:1.5rem;margin:0;padding:0;list-style:none}
+    .nav-menu a{text-decoration:none;color:#333;font-weight:700}
+    .nav-menu a:hover{color:var(--primary-orange)}
+    .flight-results-section{padding:2rem 0}
+    .flight-results-heading{font-size:1.5rem;font-weight:700;margin-bottom:.35rem}
+    .flight-results-sub{font-size:.9rem;color:var(--text-muted);margin-bottom:1.5rem}
+    .flight-results-csv-badge{display:inline-block;background:rgba(31,47,122,.1);color:var(--primary-blue);padding:.25rem .5rem;border-radius:4px;font-size:.8rem;font-weight:600;margin-bottom:1rem}
+    .flight-results-list{display:flex;flex-direction:column;gap:1rem}
+    .flight-result-card{display:flex;flex-wrap:wrap;align-items:center;gap:1.5rem;padding:1.25rem 1.5rem;background:#fff;border:1px solid var(--border-light);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:box-shadow .2s,transform .2s}
+    .flight-result-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.08);transform:translateY(-2px)}
+    .flight-result-airline-wrap{display:flex;flex-direction:column;align-items:center;gap:.35rem;min-width:80px}
+    .flight-result-airline{font-weight:700;font-size:.8rem}
+    .flight-result-depart,.flight-result-arrive{display:flex;flex-direction:column;gap:.15rem}
+    .flight-result-time{font-weight:600;font-size:1rem}
+    .flight-result-code{font-size:.85rem;font-weight:600;color:var(--text-muted)}
+    .flight-result-duration-wrap{flex:1;text-align:center;min-width:100px}
+    .flight-result-duration{font-size:.9rem;font-weight:600;color:var(--text-secondary)}
+    .flight-result-stops{font-size:.8rem;color:var(--text-muted)}
+    .flight-result-price-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem}
+    .flight-result-price{font-size:1.25rem;font-weight:700}
+    .btn-book-now{padding:.5rem 1.25rem;border-radius:8px;border:none;background:var(--primary-orange);color:#fff;font-size:.9rem;cursor:pointer}
+    .btn-book-now:hover{background:var(--dark-orange)}
+    .flight-results-empty{padding:2rem;text-align:center;color:var(--text-muted)}
+    .flight-results-loading{text-align:center;padding:3rem;color:var(--text-muted)}
+    .back-search{display:inline-flex;align-items:center;gap:.5rem;color:var(--primary-blue);text-decoration:none;font-weight:600;margin-bottom:1.5rem}
+    .back-search:hover{color:var(--dark-blue)}
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <a href="index.html" class="brand-link">
+      <img src="build/images/Travelian logo.png" alt="Travelian" class="brand-logo" />
+    </a>
+    <nav class="nav-menu">
+      <a href="index.html">Home</a>
+      <a href="build/umrah-packages.html">Umrah</a>
+      <a href="build/visit-visa.html">Visit Visa</a>
+      <a href="build/contact-us.html">Contact</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <a href="index.html" class="back-search"><i class="fa-solid fa-arrow-left"></i> New Search</a>
+    <section class="flight-results-section">
+      <h1 class="flight-results-heading" id="results-heading">Flight Results</h1>
+      <p class="flight-results-sub" id="results-sub"></p>
+      <span class="flight-results-csv-badge">From routes & airlines data</span>
+      <div id="flight-results-loading" class="flight-results-loading">Loading flights...</div>
+      <div id="flight-results-list" class="flight-results-list" style="display:none;"></div>
+    </section>
+  </div>
+
+  <script>
+    (function() {
+      var isFile = window.location.protocol === 'file:';
+      if (isFile) {
+        document.getElementById('flight-results-loading').style.display = 'none';
+        document.getElementById('flight-results-list').style.display = 'block';
+        var qs = window.location.search || '';
+        document.getElementById('flight-results-list').innerHTML =
+          '<p class="flight-results-empty">This page was opened as a file. The API cannot be reached. <a href="http://localhost:3000/flight-results.html' + qs + '">Click here to open via the server</a> (make sure <code>node server/app.js</code> is running first).</p>';
+        return;
+      }
+      var API_BASE = window.location.origin;
+      var params = new URLSearchParams(window.location.search);
+      var origin = params.get('originCode') || '';
+      var dest = params.get('destinationCode') || '';
+      var date = params.get('dateOfDeparture') || '';
+      var adults = params.get('adults') || '1';
+      var directOnly = params.get('directOnly') === '1';
+
+      var heading = document.getElementById('results-heading');
+      var sub = document.getElementById('results-sub');
+      var loading = document.getElementById('flight-results-loading');
+      var listEl = document.getElementById('flight-results-list');
+
+      if (!origin || !dest || !date) {
+        loading.style.display = 'none';
+        listEl.style.display = 'block';
+        listEl.innerHTML = '<p class="flight-results-empty">Missing search parameters. Please search from the <a href="index.html">home page</a>.</p>';
+        return;
+      }
+
+      heading.textContent = origin + ' → ' + dest;
+      sub.textContent = 'Departure: ' + date + (directOnly ? ' · Direct flights only' : '');
+
+      var url = API_BASE + '/api/flight-search-csv?originCode=' + encodeURIComponent(origin) + '&destinationCode=' + encodeURIComponent(dest) + '&dateOfDeparture=' + encodeURIComponent(date) + '&adults=' + encodeURIComponent(adults);
+      if (directOnly) url += '&directOnly=1';
+
+      fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+        loading.style.display = 'none';
+        listEl.style.display = 'flex';
+
+        var flights = (data.data || []).slice();
+        var carriers = (data.dictionaries || {}).carriers || {};
+        flights.sort(function(a, b) {
+          return parseInt(a.price && a.price.total || 0, 10) - parseInt(b.price && b.price.total || 0, 10);
+        });
+
+        if (flights.length === 0) {
+          listEl.innerHTML = '<p class="flight-results-empty">No flights found for this route. Try different airports or dates.</p>';
+          return;
+        }
+
+        var html = '';
+        flights.forEach(function(f) {
+          var seg = (f.itineraries && f.itineraries[0] && f.itineraries[0].segments && f.itineraries[0].segments[0]) || {};
+          var dep = seg.departure || {};
+          var arr = seg.arrival || {};
+          var depTime = (dep.at || '').slice(11, 16) || '--:--';
+          var arrTime = (arr.at || '').slice(11, 16) || '--:--';
+          var code = (f.validatingAirlineCodes && f.validatingAirlineCodes[0]) || seg.carrierCode || '';
+          var name = carriers[code] || code;
+          var totalNum = f.price && f.price.total ? parseInt(f.price.total, 10) : 0;
+          var price = totalNum ? ('PKR ' + totalNum.toLocaleString()) : 'N/A';
+          var dur = (f.itineraries && f.itineraries[0] && f.itineraries[0].duration) ? f.itineraries[0].duration.replace('PT', '').replace('H', 'h ').replace('M', 'm') : '3h 15m';
+          var stopText = (seg.departure && seg.arrival) ? 'Nonstop' : '';
+
+          html += '<div class="flight-result-card">' +
+            '<div class="flight-result-airline-wrap"><span class="flight-result-airline">' + (name || code) + '</span></div>' +
+            '<div class="flight-result-depart"><span class="flight-result-time">' + depTime + '</span><span class="flight-result-code">' + (dep.iataCode || '') + '</span></div>' +
+            '<div class="flight-result-duration-wrap"><span class="flight-result-duration">' + dur + '</span><span class="flight-result-stops">' + stopText + '</span></div>' +
+            '<div class="flight-result-arrive"><span class="flight-result-time">' + arrTime + '</span><span class="flight-result-code">' + (arr.iataCode || '') + '</span></div>' +
+            '<div class="flight-result-price-wrap"><span class="flight-result-price">' + price + '</span><span>Economy</span><button type="button" class="btn-book-now">Select</button></div></div>';
+        });
+        listEl.innerHTML = html;
+      }).catch(function() {
+        loading.style.display = 'none';
+        listEl.style.display = 'block';
+        listEl.innerHTML = '<p class="flight-results-empty">Cannot load results. Start the server: <code>cd server</code> then <code>node app.js</code>. Then open <a href="http://localhost:3000">http://localhost:3000</a> and search again.</p>';
+      });
+    })();
+  </script>
+</body>
+</html>
