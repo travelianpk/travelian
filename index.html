@@ -954,7 +954,7 @@
       left: auto;
       transform: none;
       width: 100%;
-      overflow: hidden;
+      overflow: visible;
       border-radius: 20px;
       border: 2px solid rgba(255,255,255,0.9);
       background: rgba(255,251,247,0.99);
@@ -963,7 +963,8 @@
       padding-right: 0;
     }
     @media (max-width: 768px) {
-      .hero { overflow-x: hidden; overflow-y: visible; min-height: calc(100vh - 60px); display: flex; flex-direction: column; }
+      .hero { overflow-x: clip; overflow-y: visible; min-height: auto; display: flex; flex-direction: column; padding-bottom: 0; }
+      .hero .page-hero.hero-banner { margin-bottom: 0; }
       /* Compact banner */
       .hero .page-hero.hero-banner .page-hero__bg,
       .hero .page-hero.hero-banner .page-hero__bg img {
@@ -972,23 +973,62 @@
         object-fit: cover;
         object-position: center;
       }
-      .hero .page-hero.hero-banner { padding-bottom: 0.5rem; min-height: 0; flex-shrink: 0; }
+      .hero .page-hero.hero-banner { padding-bottom: 0.25rem; min-height: 0; flex-shrink: 0; margin-bottom: 0; }
       .hero .home-flight-search-wrap {
         width: calc(100% - 1rem);
         max-width: calc(100vw - 1rem);
-        top: 50%;
+        top: calc(100px + 0.5rem);
         left: 50%;
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, 0);
+        margin-top: 0;
         padding: 0;
         box-sizing: border-box;
       }
-      .transparent-home-search { max-width: 100%; overflow: visible; max-height: 100%; }
-      .transparent-search-content { overflow: visible; }
+      /* Hard stop: search container must not be scrollable */
+      .hero .home-flight-search-wrap,
+      .hero .transparent-flight-search.transparent-home-search,
+      .hero .transparent-home-search,
+      .hero .transparent-search-content {
+        overflow: clip !important;
+        overflow-y: clip !important;
+        max-height: none !important;
+        height: auto !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+      }
+      .hero .home-flight-search-wrap::-webkit-scrollbar,
+      .hero .transparent-home-search::-webkit-scrollbar,
+      .hero .transparent-search-content::-webkit-scrollbar {
+        width: 0 !important;
+        height: 0 !important;
+        display: none !important;
+      }
+      /* Remove any accidental inner scrolling inside home search */
+      .hero .transparent-home-search *,
+      .hero .home-flight-search-wrap * {
+        max-height: none !important;
+        overflow-y: visible !important;
+      }
+      /* Keep intended dropdowns scrollable */
+      .hero .airport-dropdown-transparent,
+      .hero .origin-typeahead-content.isShow,
+      .hero .from-airport-panel,
+      .hero .from-airport-panel .from-panel-list,
+      .hero .passengers-dropdown,
+      .hero .class-dropdown {
+        overflow-y: auto !important;
+      }
+      .transparent-home-search { max-width: 100%; }
       /* Compact form so full search fits without scroll */
       .etihad-fields-row { flex-direction: column !important; flex-wrap: wrap !important; gap: 0.35rem !important; }
       .etihad-field { flex: 1 1 100% !important; min-width: 100% !important; min-height: 46px !important; padding: 0.5rem 0.6rem !important; }
       .etihad-swap-btn { align-self: center; width: 36px !important; height: 36px !important; min-width: 36px !important; min-height: 36px !important; }
       .etihad-search-btn { height: 38px !important; min-height: 38px !important; font-size: 0.85rem !important; }
+      .hero .etihad-search-btn {
+        display: block !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
       .etihad-search-form { gap: 0.3rem !important; }
       .transparent-home-search .transparent-search-content:has(.etihad-hero-form.active) { padding: 0.4rem 0.75rem 0.6rem !important; }
       .etihad-pill-row { margin-bottom: 0.4rem; }
@@ -1006,11 +1046,14 @@
       .etihad-field { min-height: 42px !important; padding: 0.45rem 0.5rem !important; }
     }
     
-    /* Why Choose Travelian – below hero/search, never overlaps */
+    /* Why Choose Travelian – below hero/search */
     #home-middle-content {
-      margin-top: 0;
+      margin-top: 200px;
       position: relative;
       z-index: 0;
+    }
+    @media (max-width: 768px) {
+      .hero { padding-bottom: 19rem; }
     }
     #home-middle-content .why-choose-us-section {
       background: #fff;
@@ -1325,6 +1368,7 @@
       .hero .transparent-flight-search.transparent-home-search {
         position: relative !important; top: auto !important; left: auto !important; transform: none !important;
         width: 100% !important; max-width: 100% !important; display: block !important; visibility: visible !important;
+        overflow: visible !important; overflow-y: visible !important; max-height: none !important;
       }
       .transparent-flight-search { padding-right: 12px; padding-left: 12px; border-radius: 12px; width: 100%; max-width: 100%; box-sizing: border-box; }
       .transparent-search-tabs { flex-wrap: wrap; border-radius: 12px 12px 0 0; }
@@ -1353,49 +1397,31 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var transparentSearch = document.querySelector('.transparent-flight-search');
-      // Auto-scroll for clear view of dropdown when user interacts with search
-      (function initSearchAreaScroll() {
-        var searchWrap = document.querySelector('.hero .home-flight-search-wrap');
-        if (!searchWrap) return;
-        var headerOffset = 100;
-        var dropdownSpace = 420;
-        function scrollForDropdownView() {
-          var rect = searchWrap.getBoundingClientRect();
-          if (rect.top < headerOffset) {
-            var scrollTop = window.scrollY + rect.top - headerOffset;
-            window.scrollTo({ top: Math.max(0, scrollTop), behavior: 'smooth' });
-          } else if (rect.bottom + dropdownSpace > window.innerHeight) {
-            var scrollBy = rect.bottom + dropdownSpace - window.innerHeight;
-            window.scrollTo({ top: window.scrollY + scrollBy, behavior: 'smooth' });
-          }
+      // Force-disable accidental internal scrolling in home search on mobile.
+      (function enforceHomeSearchNoScroll() {
+        if (window.innerWidth > 768) return;
+        var root = document.querySelector('.hero .transparent-home-search');
+        if (!root) return;
+        function applyNoScroll(el) {
+          if (!el) return;
+          el.style.overflow = 'visible';
+          el.style.overflowY = 'visible';
+          el.style.maxHeight = 'none';
+          el.style.height = 'auto';
         }
-        function onFieldFocus() {
-          scrollForDropdownView();
-          setTimeout(scrollForDropdownView, 180);
-          setTimeout(function() {
-            var target = window.scrollY + 270;
-            window.scrollTo(0, target);
-            document.documentElement.scrollTop = target;
-            document.body.scrollTop = target;
-          }, 100);
-        }
-        var fields = [
-          'transparent-txtOriginFull-home', 'transparent-txtDestinationFull-home',
-          'transparent-passengers-home', 'transparent-depart-date-home'
-        ];
-        fields.forEach(function(id) {
-          var el = document.getElementById(id);
-          if (el) {
-            el.addEventListener('focus', onFieldFocus);
-            el.addEventListener('click', onFieldFocus);
-          }
+        applyNoScroll(root);
+        var blocked = root.querySelectorAll('*');
+        blocked.forEach(function(node) {
+          var allowDropdown = node.closest('.airport-dropdown-transparent, .origin-typeahead-content, .from-airport-panel, .from-panel-list, .passengers-dropdown, .class-dropdown');
+          if (!allowDropdown) applyNoScroll(node);
         });
-        document.querySelectorAll('.hero .etihad-field-dates label, .hero .etihad-field-from label, .hero .etihad-field-to label, .hero .etihad-field-guests label').forEach(function(lab) {
-          lab.addEventListener('click', function() { setTimeout(onFieldFocus, 50); });
-        });
-        var form = document.getElementById('transparent-search-form-home');
-        if (form) form.addEventListener('focusin', function(e) { if (e.target.matches('input, select, [role="combobox"]')) onFieldFocus(); });
+        setTimeout(function() {
+          applyNoScroll(root);
+        }, 250);
       })();
+      // Keep page stable while interacting with home search.
+      // Previous auto-scroll behavior caused repeated unwanted scrolling.
+      (function initSearchAreaScroll() {})();
 
       // Tab switching functionality
       if (transparentSearch) {
