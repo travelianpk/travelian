@@ -41,6 +41,13 @@
     .flight-results-loading{text-align:center;padding:3rem;color:var(--text-muted)}
     .back-search{display:inline-flex;align-items:center;gap:.5rem;color:var(--primary-blue);text-decoration:none;font-weight:600;margin-bottom:1.5rem}
     .back-search:hover{color:var(--dark-blue)}
+    .floating-whatsapp{position:fixed;right:24px;bottom:24px;z-index:10001;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#25d366;color:#fff;font-size:1.75rem;text-decoration:none;box-shadow:0 8px 24px rgba(37,211,102,.35);transition:transform .2s,background .2s}
+    .floating-whatsapp:hover{background:#1ebc5b;color:#fff;transform:translateY(-2px) scale(1.04)}
+    @media (max-width:600px){.floating-whatsapp{right:16px;bottom:16px;width:52px;height:52px;font-size:1.55rem}}
+    #scroll-to-top{position:fixed;bottom:calc(94px + env(safe-area-inset-bottom));right:calc(24px + env(safe-area-inset-right));width:48px;height:48px;border-radius:50%;background:var(--primary-orange);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(242,137,27,.45);z-index:10002;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s,transform .2s}
+    #scroll-to-top.visible{opacity:1;visibility:visible}
+    #scroll-to-top:hover{background:var(--dark-orange);transform:scale(1.08)}
+    @media (max-width:600px){#scroll-to-top{bottom:calc(80px + env(safe-area-inset-bottom));right:calc(16px + env(safe-area-inset-right));width:44px;height:44px}}
   </style>
 </head>
 <body>
@@ -66,9 +73,32 @@
       <div id="flight-results-list" class="flight-results-list" style="display:none;"></div>
     </section>
   </div>
+  <a class="floating-whatsapp" href="https://wa.me/923244440014" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+    <i class="fa-brands fa-whatsapp"></i>
+  </a>
+  <button type="button" id="scroll-to-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M18 15l-6-6-6 6"/>
+    </svg>
+  </button>
 
   <script>
     (function() {
+      var scrollTopBtn = document.getElementById('scroll-to-top');
+      function onScrollTopToggle() {
+        if (!scrollTopBtn) return;
+        var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+        if (y > 300) scrollTopBtn.classList.add('visible');
+        else scrollTopBtn.classList.remove('visible');
+      }
+      window.addEventListener('scroll', onScrollTopToggle, { passive: true });
+      if (scrollTopBtn) {
+        scrollTopBtn.addEventListener('click', function() {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+      onScrollTopToggle();
+
       var isFile = window.location.protocol === 'file:';
       if (isFile) {
         document.getElementById('flight-results-loading').style.display = 'none';

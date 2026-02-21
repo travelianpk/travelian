@@ -163,14 +163,19 @@
 
     function positionPanel() {
       var rect = inputEl.getBoundingClientRect();
-      var searchArea = inputEl.closest('.transparent-home-search') || inputEl.closest('.transparent-flight-search');
+      var searchArea = inputEl.closest('.transparent-search-content') ||
+        inputEl.closest('.transparent-home-search') ||
+        inputEl.closest('.transparent-flight-search') ||
+        inputEl.closest('.home-flight-search-wrap');
       if (searchArea) {
         var sa = searchArea.getBoundingClientRect();
         panel.style.left = sa.left + 'px';
-        panel.style.width = Math.min(380, Math.max(320, sa.width)) + 'px';
+        panel.style.width = sa.width + 'px';
+        panel.style.right = 'auto';
       } else {
         panel.style.left = Math.max(16, Math.min(rect.left, window.innerWidth - 396)) + 'px';
         panel.style.width = '380px';
+        panel.style.right = 'auto';
       }
       panel.style.top = (rect.bottom + 4) + 'px';
       panel.style.maxHeight = 'calc(100vh - ' + (rect.bottom + 24) + 'px)';
@@ -319,7 +324,10 @@
 
     function positionDropdown() {
       var rect = inputEl.getBoundingClientRect();
-      var searchSection = inputEl.closest('.transparent-search-content') || inputEl.closest('.home-flight-search-wrap');
+      var searchSection = inputEl.closest('.transparent-search-content') ||
+        inputEl.closest('.transparent-home-search') ||
+        inputEl.closest('.transparent-flight-search') ||
+        inputEl.closest('.home-flight-search-wrap');
       var fieldContainer = inputEl.closest('.etihad-field-from') || inputEl.closest('.etihad-field-to');
       var anchor = fieldContainer ? fieldContainer.getBoundingClientRect() : rect;
       var w;
